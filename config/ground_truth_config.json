@@ -1,0 +1,40 @@
+{
+  "megalopta":{
+    "raw_data": {
+               "PB": "/mnt/hdd2/DATA/ground_truth/megalopta/PB4_merged.zarr",
+               "FB": "/mnt/hdd2/DATA/ground_truth/megalopta/FB5_merged.zarr",
+               "EB": "/mnt/hdd2/DATA/ground_truth/megalopta/EB6_merged.zarr",
+               "NO": "/mnt/hdd2/DATA/ground_truth/megalopta/NO1_merged.zarr"
+                },
+    "ground_truth": {
+                "PB": ["/mnt/hdd2/DATA/ground_truth/megalopta/PB4_merged.zarr"],
+                "FB": ["/mnt/hdd2/DATA/ground_truth/megalopta/FB5_merged.zarr"],
+                "EB": ["/mnt/hdd2/DATA/ground_truth/megalopta/EB6_merged.zarr"],
+                "NO": ["/mnt/hdd2/DATA/ground_truth/megalopta/NO1_merged.zarr"]
+                    },
+    "ground_truth_dataset": "gt_merged"
+                },
+  "eciton": {
+    "raw_data": {
+              "MB_gt1": "/mnt/hdd2/DATA/ground_truth/eciton/raw_data_expanded/gt1_expanded_708_771.zarr",
+              "MB_gt2": "/mnt/hdd2/DATA/ground_truth/eciton/raw_data_expanded/gt2_expanded_707_770.zarr",
+              "MB_gt3": "/mnt/hdd2/DATA/ground_truth/eciton/raw_data_expanded/gt3_expanded_1713_1776.zarr",
+              "MB_gt4": "/mnt/hdd2/DATA/ground_truth/eciton/raw_data_expanded/gt4_expanded_834_897.zarr",
+              "MB_gt5": "/mnt/hdd2/DATA/ground_truth/eciton/raw_data_expanded/gt5_expanded_838_901.zarr",
+              "MB_gt6": "/mnt/hdd2/DATA/ground_truth/eciton/raw_data_expanded/gt6_expanded_1670_1733.zarr",
+              "MB_gt7": "/mnt/hdd2/DATA/ground_truth/eciton/raw_data_expanded/gt7_expanded_2081_2144.zarr",
+              "MB_gt8": "/mnt/hdd2/DATA/ground_truth/eciton/raw_data_expanded/gt8_expanded_881_944.zarr"
+                },
+    "ground_truth": {
+              "MB_gt1": ["/mnt/hdd2/DATA/ground_truth/eciton/gt1_722_757_labels_corrected.zarr"],
+              "MB_gt2": ["/mnt/hdd2/DATA/ground_truth/eciton/gt2_721_756_labels_corrected.zarr"],
+              "MB_gt3": ["/mnt/hdd2/DATA/ground_truth/eciton/gt3_1727_1762_labels_corrected.zarr"],
+              "MB_gt4": ["/mnt/hdd2/DATA/ground_truth/eciton/gt4_848_883_labels_corrected.zarr"],
+              "MB_gt5": ["/mnt/hdd2/DATA/ground_truth/eciton/gt5_852_887_labels_corrected.zarr"],
+              "MB_gt6": ["/mnt/hdd2/DATA/ground_truth/eciton/gt6_1684_1719_labels_corrected.zarr"],
+              "MB_gt7": ["/mnt/hdd2/DATA/ground_truth/eciton/gt7_2095_2130_labels_corrected.zarr"],
+              "MB_gt8": ["/mnt/hdd2/DATA/ground_truth/eciton/gt8_895_930_labels_corrected.zarr"]
+                    },
+    "ground_truth_dataset": "gt"
+            }
+}

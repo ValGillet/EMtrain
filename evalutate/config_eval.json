@@ -1,0 +1,16 @@
+{
+  "fragments_file": "../predict/workers/output/megalopta_NO_RAW_frags_setup03_0_2_01032022.zarr",
+  "fragments_dataset": "frags",
+  "db_host": "mongodb://admin:autoseg-mongodb@localhost", 
+  "edges_db_name": "megalopta_NO_RAW_setup_03_0_2_01032022",
+  "edges_collection": "edges_hist_quant_50",
+  "annotations_db_name": "megaloptaNO_skeletons_reviewed_complete",
+  "annotations_skeletons_collection_name": "NOtest1",
+  "scores_db_name": "megalopta_NO_RAW_eval_setup_03_0_2_600000_08032022",
+  "scores_collection_name": "test_cube1.scores_hist_quant_50",
+  "thresholds_minmax": [0, 1],
+  "thresholds_step": 0.02,
+  "node_components": "component_id",
+  "num_workers": 20,
+  "compute_mincut_metric": "False"
+}
