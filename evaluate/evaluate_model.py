@@ -3,9 +3,11 @@ import numpy as np
 import os
 
 from glob import glob
-frim tqdm import tqdm
+from tqdm import tqdm
 
 from emsegment.Segment import segment_dataset
+from emsegment.FindSegments import find_segments
+
 
 
 def fun(output_dir,
@@ -72,8 +74,16 @@ def fun(output_dir,
                                 seg_config=seg_config,
                                 return_config=True
                                 )
+        
         # Find connected components
-
+        find_segments(
+                  db_name=seg_config['db_name'],
+                  fragments_path=seg_config['fragments_path'],
+                  edges_collection=seg_config['edges_collection'],
+                  thresholds_minmax=[0,1],
+                  thresholds_step=0.2,
+                  num_workers=num_workers)
+        
     # Run evaluation
     # Return eval results
 
