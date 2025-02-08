@@ -1,4 +1,6 @@
 *.ipynb_checkpoints
 *.ipynb
+evaluate/daisy_logs
+tuning/daisy_logs
 config/
 __pycache__/

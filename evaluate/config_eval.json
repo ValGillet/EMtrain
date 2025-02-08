@@ -1,0 +1,14 @@
+{
+  "fragments_file": "/mnt/raid/segmentation/megalopta/megalopta_NO_test_setup_03_0_2_FBOK_600000_2/megalopta_NO_test_setup_03_0_2_FBOK_600000_2_frags.zarr",
+  "fragments_dataset": "frags",
+  "db_host": null, 
+  "edges_db_name": "megalopta_NO_test_setup_03_0_2_FBOK_600000_2",
+  "edges_collection": "edges_hist_quant_50",
+  "test_sk_annotation": "finished within test_cube1",
+  "test_volume": "test_cube1",
+  "thresholds_minmax": [0, 1],
+  "thresholds_step": 0.1,
+  "node_components": "component_id",
+  "num_workers": 30,
+  "compute_mincut_metric": "True"
+}

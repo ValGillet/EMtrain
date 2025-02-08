@@ -1,10 +1,14 @@
+import os
+# Influences performance
+os.environ['OMP_NUM_THREADS'] = '4'
+os.environ['MKL_NUM_THREADS'] = '4'
+
 import argparse
 import comet_ml
 import gunpowder as gp
 import json
 import logging
 import numpy as np
-import os
 import torch
 
 from datetime import datetime
@@ -12,8 +16,8 @@ from funlib.learn.torch.models import UNet, ConvPass
 from glob import glob
 from lsd.train.gp import AddLocalShapeDescriptor
 
-from utils.comet_log import comet_log_batch
-from utils.prep_augments import get_augment_parameters
+from utils.comet.comet_log import comet_log_batch
+from tuning.prep_augments import get_augment_parameters
 
 # TODO: Auto new project creation
 

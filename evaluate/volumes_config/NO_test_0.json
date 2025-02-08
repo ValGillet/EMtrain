@@ -1,0 +1,8 @@
+{
+  "project": "megalopta",
+  "catmaid_project_id": 8,
+  "raw_path": "/mnt/raid/image_data/megalopta/NO_R.zarr",
+  "raw_dataset": "raw",
+  "roi_start_nm": [158100,135300,226990],
+  "roi_size_nm": [20000, 20000, 20000]
+}
