@@ -6,6 +6,6 @@
   "test_sk_annotation": "",
   "raw_path": "/mnt/raid/image_data/megalopta/NO_R.zarr",
   "raw_dataset": "raw",
-  "roi_start_nm": [158100,135300,226990],
-  "roi_size_nm": [20000, 20000, 20000]
+  "roi_start_nm": [168100,145300,236990],
+  "roi_size_nm": [10000, 10000, 10000]
 }
