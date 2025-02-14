@@ -5,14 +5,12 @@ import os
 from glob import glob
 from tqdm import tqdm
 
-from emsegment.Segment import segment_dataset
-from emsegment.FindSegments import find_segments
-from emtrain.evaluate.evaluate_volume import EvaluateAnnotations
+from emtrain.evaluate.workers.evaluate_model_worker import evaluate_model
 
 from subprocess import check_call
 
 
-def evaluate_model(output_dir,
+def evaluate_models(output_dir,
                    model_dir,
                    eval_config, 
                    num_workers,
@@ -70,6 +68,31 @@ def evaluate_model(output_dir,
         db_name = project_prefix + '_' + db_name
         db_name = db_name + '_' + volume_suffix
 
+        config = {
+                'project_dir': project_dir,
+                'project_prefix': project_prefix,
+                'model_config': model_config,
+                'eval_config': eval_config,
+                'catmaid_secrets': catmaid_secrets,
+                'seg_config_path': seg_config_path,
+                'num_workers': num_workers,
+                'thresholds_minmax': thresholds_minmax,
+                'thresholds_step': thresholds_step,
+                'GPU_pool': GPU_pool
+                 }
+
+        worker_script = '/mnt/hdd1/SRC/EMpipelines/EMtrain/emtrain/evaluate/workers/evaluate_model_worker.py'
+        config_dir = os.path.join(os.path.dirname(worker_script), 'worker_config')
+        config_path = os.path.join(config_dir, db_name + '_config.json')
+        with open(config_path, 'w') as f:
+            json.dump(config, f, indent='')
+
+        command = ['python', 
+                   worker_script, 
+                   config_path]
+        check_call(' '.join(command), shell=True)
+
+
  
 
 
@@ -87,7 +110,7 @@ if __name__ == '__main__':
     model_dirs = sorted(glob('/mnt/hdd2/DATA/segmentation_training/eciton_only/*'))
     for model_dir in model_dirs:
         print(model_dir)
-        evaluate_model(output_dir,
+        evaluate_models(output_dir,
                         model_dir,
                         eval_config, 
                         num_workers,

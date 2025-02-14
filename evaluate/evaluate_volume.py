@@ -40,7 +40,7 @@ class EvaluateAnnotations():
                  compute_mincut_metric,
                  catmaid_secrets,
                  annotations_synapses_collection_name = None,
-                 iteration = None
+                 iteration = None,
                  **kwargs):
 
         self.fragments_file = fragments_file
@@ -67,6 +67,8 @@ class EvaluateAnnotations():
         self.thresholds_step = thresholds_step
         self.compute_mincut_metric = compute_mincut_metric
 
+        with open(catmaid_secrets, 'r') as f:
+            catmaid_secrets = json.load(f)
         self.catmaid_client = pymaid.CatmaidInstance(server=catmaid_secrets['server'], 
                                                      api_token=catmaid_secrets['token'],
                                                      http_user=catmaid_secrets['http_user'],
@@ -287,6 +289,8 @@ class EvaluateAnnotations():
 
         for proc in procs:
             proc.join()
+
+        return True
 
 
     def get_site_segment_ids(self, threshold):
