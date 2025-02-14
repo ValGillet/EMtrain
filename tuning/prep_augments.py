@@ -12,6 +12,10 @@ from skopt.space import Real, Integer
 logging.basicConfig(level=logging.INFO)
 
 def get_augment_parameters(output_path,
+                           project_dir=None,
+                           eval_config=None,
+                           eval_edges_collection=None,
+                           db_host=None,
                            mode='random',
                            return_config=False):
     
@@ -34,9 +38,16 @@ def get_augment_parameters(output_path,
         augment_config = random_search(search_space)
     elif mode == 'bayesopt':
         # Use evaluations of previous models to choose the optimal next parameter combination to use
-        augment_config = bayesian_opt(search_space)
+        augment_config = bayesian_opt(search_space,
+                                      project_dir,
+                                      eval_config,
+                                      eval_edges_collection,
+                                      db_host)
     else:
         raise NotImplementedError(f'{mode} for augment parameters search not implemented')
+
+    if return_config:
+        return augment_config
 
     logging.info(f'Saving parameters at {output_path}')
     with open(output_path, 'w') as f:
