@@ -2,5 +2,6 @@
 *.ipynb
 daisy_log/
 worker_config/
+volumes_config/
 config/
 __pycache__/
