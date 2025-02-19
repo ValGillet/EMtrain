@@ -1,6 +1,6 @@
 *.ipynb_checkpoints
 *.ipynb
-daisy_log/
+daisy_logs/
 worker_config/
 volumes_config/
 config/
