@@ -14,7 +14,6 @@ logging.basicConfig(level=logging.INFO)
 def get_augment_parameters(output_path,
                            project_dir=None,
                            eval_config=None,
-                           eval_edges_collection=None,
                            db_host=None,
                            mode='random',
                            return_config=False):
@@ -41,7 +40,6 @@ def get_augment_parameters(output_path,
         augment_config = bayesian_opt(search_space,
                                       project_dir,
                                       eval_config,
-                                      eval_edges_collection,
                                       db_host)
     else:
         raise NotImplementedError(f'{mode} for augment parameters search not implemented')
@@ -95,8 +93,11 @@ def random_search(search_space):
 def bayesian_opt(search_space,
                  project_dir,
                  eval_config,
-                 edges_collection='edges_hist_quant_50',
                  db_host=None):
+    
+    '''
+    project_dir: Directory containing the models. The name of the directory will be considered as the project name.
+    '''
     
     with open(eval_config, 'r') as f:
         eval_config = json.load(f)
@@ -113,7 +114,6 @@ def bayesian_opt(search_space,
     project_name = os.path.basename(project_dir)
     volume_suffix = eval_config['volume_suffix']
     volume_name = os.path.basename(eval_config['raw_path']).rstrip('.zarr')
-    coll_name = '_'.join(['eval', volume_name, edges_collection])
      
     client = MongoClient(db_host)
     db_names = []
@@ -124,7 +124,11 @@ def bayesian_opt(search_space,
     # Get evaluations and corresponding augmentation parameters
     models_stats = defaultdict(dict)
     for db_name in db_names:
-        coll = client[db_name][coll_name]
+        db = client[db_name]
+
+        edges_collection = db.info_segmentation.find_one({'task': 'agglomeration'})['edges_collection']
+        coll_name = '_'.join(['eval', volume_name, edges_collection])
+        coll = db[coll_name]
         docs = list(coll.find({},{'_id':0,
                                 'voi_split': 1,
                                 'voi_merge': 1
@@ -169,11 +173,17 @@ def bayesian_opt(search_space,
         optimizer.tell(p, score)
 
     # Ask the optimizer for the next best hyperparameters
+    # By default the optimizer tries to minimize the score
     next_hyperparameters = optimizer.ask()
 
     # Organize config and return
     augment_config = {}
     for k, p in zip(list(search_space.keys()), next_hyperparameters):
+        if isinstance(p, np.int64):
+            p = int(p)
+        elif isinstance(p, np.float32):
+            p = float(p)
+
         if k == 'elastic_spacing':
             p = [10, p, p]
         elif k == 'elastic_jitter':

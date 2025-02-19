@@ -3,10 +3,12 @@ import os
 os.environ['OMP_NUM_THREADS'] = '4'
 os.environ['MKL_NUM_THREADS'] = '4'
 
+from emtrain.utils.comet.comet_log import comet_log_batch
+from emtrain.utils.training.prep import prep_training_experiment
+
 import argparse
 import comet_ml
 import gunpowder as gp
-import json
 import logging
 import numpy as np
 import torch
@@ -16,8 +18,6 @@ from funlib.learn.torch.models import UNet, ConvPass
 from glob import glob
 from lsd.train.gp import AddLocalShapeDescriptor
 
-from utils.comet.comet_log import comet_log_batch
-from tuning.prep_augments import get_augment_parameters
 
 # TODO: Auto new project creation
 
@@ -81,119 +81,51 @@ class AffsLsdModel(torch.nn.Module):
         lsds = self.conv_lsds(y)
 
         return affs, lsds
-    
-def prep_training_experiment(project_dir,
-                             training_config=None):
-    
-    
-    training_path = os.path.join(project_dir, 'training_config.json')
-
-    if os.path.exists(training_path):
-        # Using existing config for a project that was started
-        # Get all parameters from configs
-        with open(training_path, 'r') as f:
-            training_config = json.load(f)
-
-        ground_truth_config = training_config['ground_truth']
-        model_config        = training_config['model']
-        augment_config      = training_config['augment_config']
-
-        with open(ground_truth_config['ground_truth_config'], 'r') as f:
-            ground_truth_config = json.load(f)
-
-        with open(training_config['augment_config'], 'r') as f:
-            augment_config = json.load(f)
-
-        return training_config, ground_truth_config, model_config, augment_config
-    
-    else:
-        assert training_config is not None, f'There is no existing config in {project_dir}. Please provide one.'
-        # Creating new config for a new project
-        # Get all parameters from configs
-        with open(training_config, 'r') as f:
-            training_config = json.load(f)
-
-        ground_truth_config = training_config['ground_truth']
-        model_config        = training_config['model']
-        augment_config      = training_config['augment_config']
-    
-        # Get ground-truth
-        with open(ground_truth_config['ground_truth_config'], 'r') as f:
-            ground_truth_config = json.load(f)
-        
-        # Get augmentation parameters
-        if training_config['augment_config'] is not None:
-            with open(training_config['augment_config'], 'r') as f:
-                augment_config = json.load(f)
-        else:
-            augment_config = get_augment_parameters(None, return_config=True)
-        
-        # Create project dir if doesn't exist
-        if 'project_dir' not in training_config.keys():
-            os.makedirs(project_dir, exist_ok=True)
-        else:
-            project_dir = training_config['project_dir']
-
-        # Save augment config
-        augment_path = os.path.join(project_dir, 'augment_config.json')
-        with open(augment_path, 'w') as f:
-            json.dump(augment_config, f, indent='')
-
-        # Save ground-truth config
-        ground_truth_path = os.path.join(project_dir, 'ground_truth_config.json')
-        with open(ground_truth_path, 'w') as f:
-            json.dump(ground_truth_config, f, indent='')
-
-        # Save training config
-        training_config['project_dir'] = project_dir
-        training_config['augment_config'] = augment_path
-        training_config['ground_truth']['ground_truth_config'] = ground_truth_path
-        
-        with open(training_path, 'w') as f:
-            json.dump(training_config, f, indent='')
-
-    return training_config, ground_truth_config, model_config, augment_config
 
 
 def start_train(project_dir,
-                training_config,
                 GPU_ID,
                 num_workers,
                 resume_training,
+                training_config=None,
                 no_comet_log=False
                 ):
     
     project_dir = os.path.abspath(project_dir)
     project_name = project_dir.split('/')[-1]
-    existing_projects = glob(os.path.join(project_dir,'*'))
+    existing_projects = glob(os.path.join(project_dir,'*project_name*/'))
 
     if resume_training is not None and len(existing_projects)>0:
         if resume_training == '-1':
             # Continue with the latest bout
-            project_dir = sorted(existing_projects)[-1]
-            exp_name = project_dir.split('/')[-1]
+            experiment_dir = sorted(existing_projects)[-1]
+            exp_name = experiment_dir.split('/')[-1]
             logging.info(f'Resuming latest experiment: {exp_name}')
         else:
             # Continue with provided experiment name
-            project_dir = os.path.join(project_dir, resume_training)
-            exp_name = project_dir.split('/')[-1]
+            experiment_dir = os.path.join(project_dir, resume_training)
+            exp_name = experiment_dir.split('/')[-1]
             logging.info(f'Resuming experiment: {exp_name}')
+        training_config = os.path.join(experiment_dir, 'training_config.json')
     else:
+        assert training_config is not None, 'Please provide a training configuration to start a new experiment.'
         # Start new experiment
         year = datetime.now().year-2000
         exp_name = f'{year}_{project_name}_'
         index = len([p for p in existing_projects if exp_name in p])
         exp_name += str(index).zfill(2)
 
-        project_dir = os.path.join(project_dir, exp_name)
+        experiment_dir = os.path.join(project_dir, exp_name)
         logging.info(f'Starting new experiment: {exp_name}')
     
-    logging.info('Project dir:')
-    logging.info(f'    {project_dir}')
-    
+    logging.info('Experiment dir:')
+    logging.info(f'    {experiment_dir}')
+
     # Get configs
-    configs = prep_training_experiment(project_dir, training_config)
-    training_config, ground_truth_config, model_config, augment_config = configs
+    training_config, ground_truth_config, model_config, augment_config = prep_training_experiment(experiment_dir=experiment_dir,
+                                                                                                  training_config=training_config,
+                                                                                                  GPU_ID=GPU_ID,
+                                                                                                  num_workers=num_workers)
     
     # Training parameters
     num_iterations  = training_config['training']['num_iterations']
@@ -201,7 +133,6 @@ def start_train(project_dir,
     snapshots_every = training_config['training']['snapshots_every']
     cache_size      = training_config['training']['cache_size']
 
-    
     # Ground-truth config
     gt_datasets = training_config['ground_truth']['datasets']
     ground_truth_data = []
@@ -246,16 +177,16 @@ def start_train(project_dir,
         comet_exp.log_parameters(ground_truth_config)
         comet_exp.log_parameters(augment_config)
 
-        with open(os.path.join(project_dir, '.comet_exp_key'), 'w') as f:
+        with open(os.path.join(experiment_dir, '.comet_exp_key'), 'w') as f:
             f.write(comet_exp.get_key())
     elif not no_comet_log:
-        with open(os.path.join(project_dir, '.comet_exp_key'), 'r') as f:
+        with open(os.path.join(experiment_dir, '.comet_exp_key'), 'r') as f:
             exp_key = f.read()
         comet_exp = comet_ml.start(experiment_key=exp_key)
     else:
         logging.warning('\x1b[1;31m' + 'Logging to comet is disabled.' + '\x1b[0m')
 
-    train(project_dir,
+    train(experiment_dir,
           GPU_ID,
           num_workers, 
           cache_size,
@@ -279,7 +210,7 @@ def start_train(project_dir,
           snapshots_every
           )
 
-def train(project_dir,
+def train(experiment_dir,
           GPU_ID,
           num_workers, 
           cache_size,
@@ -303,7 +234,7 @@ def train(project_dir,
           snapshots_every
          ):
     
-    model_dir = os.path.join(project_dir, 'checkpoints')
+    model_dir = os.path.join(experiment_dir, 'checkpoints')
     os.makedirs(model_dir, exist_ok=True)
     
     profile_every = 10
@@ -477,7 +408,7 @@ def train(project_dir,
                                 lsds: 'lsds',
                                 pred_lsds: 'pred_lsds',
                             },
-                            output_dir=os.path.join(project_dir, 'snapshots'),
+                            output_dir=os.path.join(experiment_dir, 'snapshots'),
                             every=snapshots_every) 
 
     pipeline += gp.PrintProfilingStats(every=profile_every)

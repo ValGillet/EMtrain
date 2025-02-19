@@ -52,7 +52,6 @@ def evaluate_model(project_dir,
                     num_workers=num_workers)
     
     # Run evaluation
-
     eval = EvaluateAnnotations(fragments_file=fragments_path,
                                fragments_dataset=fragments_dataset,
                                db_host=None,
