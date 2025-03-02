@@ -37,7 +37,8 @@ def evaluate_model(project_dir,
                                 )
         
     edges_collection = seg_config['agglo_config']['edges_collection_basename'] + '_' + seg_config['agglo_config']['merge_function']
-    fragments_path, fragments_dataset = seg_config['fragments_path'].rsplit('/',1)
+    fragments_path = seg_config['fragments_path']
+    fragments_dataset = seg_config['fragments_dataset']
 
     # Find connected components
     db = MongoClient(None)[seg_config['db_name']]

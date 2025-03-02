@@ -45,8 +45,6 @@ def evaluate_model_checkpoints(output_dir,
     model_checkpoints = {}
     for checkpoint_path in glob(os.path.join(model_dir, 'checkpoints/model_checkpoint*')):
         checkpoint_it = int(checkpoint_path.split('_')[-1])
-        checkpoint_start = min(checkpoint_it) if checkpoints_start is None else checkpoints_start
-        checkpoint_end = min(checkpoint_it) if checkpoints_end is None else checkpoints_end
 
         if checkpoint_it >= checkpoints_start and checkpoint_it <= checkpoints_end:
             # Only keep checkpoints that are contained in the provided range
@@ -64,7 +62,7 @@ def evaluate_model_checkpoints(output_dir,
     model_configs = {i: {
                 'model_path': checkpoint,
                 'num_fmaps': training_config['model']['num_fmaps'],
-                'output_shape': training_config['model']['output_shape'],
+                'output_shape': [40, 160, 160],
                 'padding': padding.tolist()
                      } for i, checkpoint in dict(sorted(model_checkpoints.items())).items()}
     
