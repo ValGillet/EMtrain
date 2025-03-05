@@ -65,6 +65,5 @@ def comet_log_batch_images(i, batch, request):
         
         # Save image if not lsds
         comet_exp.log_image(img.T, 
-                            name=str(key), 
-                            copy_to_tmp=False,
+                            name=str(key),
                             step=i)
