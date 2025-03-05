@@ -93,9 +93,12 @@ def start_train(project_dir,
     
     project_dir = os.path.abspath(project_dir)
     project_name = project_dir.split('/')[-1]
-    existing_projects = glob(os.path.join(project_dir,'*project_name*/'))
+    year = datetime.now().year-2000
+    exp_name = f'{year}_{project_name}_'
+    existing_projects = glob(os.path.join(project_dir,f'*{exp_name}*/'))
 
     if resume_training is not None and len(existing_projects)>0:
+        # Override exp_name
         if resume_training == '-1':
             # Continue with the latest bout
             experiment_dir = sorted(existing_projects)[-1]
@@ -110,11 +113,8 @@ def start_train(project_dir,
     else:
         assert training_config is not None, 'Please provide a training configuration to start a new experiment.'
         # Start new experiment
-        year = datetime.now().year-2000
-        exp_name = f'{year}_{project_name}_'
         index = len([p for p in existing_projects if exp_name in p])
         exp_name += str(index).zfill(2)
-
         experiment_dir = os.path.join(project_dir, exp_name)
         logging.info(f'Starting new experiment: {exp_name}')
     
