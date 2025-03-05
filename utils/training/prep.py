@@ -35,7 +35,9 @@ def prep_training_experiment(experiment_dir,
     if augment_path is not None:
         logging.info('Using existing config files.')
         # This is the config of an existing experiment
-        return training_config, ground_truth_config, model_config, augment_path
+        with open(augment_path) as f:
+            augment_config = json.load(f)
+        return training_config, ground_truth_config, model_config, augment_config
    
     logging.info('Computing config files for the new experiment.')
     # This is a new experiment, compute new augment parameters
