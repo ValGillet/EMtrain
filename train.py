@@ -101,12 +101,12 @@ def start_train(project_dir,
         # Override exp_name
         if resume_training == '-1':
             # Continue with the latest bout
-            experiment_dir = sorted(existing_projects)[-1]
+            experiment_dir = os.path.abspath(sorted(existing_projects)[-1])
             exp_name = experiment_dir.split('/')[-1]
             logging.info(f'Resuming latest experiment: {exp_name}')
         else:
             # Continue with provided experiment name
-            experiment_dir = os.path.join(project_dir, resume_training)
+            experiment_dir = os.path.abspath(os.path.join(project_dir, resume_training))
             exp_name = experiment_dir.split('/')[-1]
             logging.info(f'Resuming experiment: {exp_name}')
         training_config = os.path.join(experiment_dir, 'training_config.json')
