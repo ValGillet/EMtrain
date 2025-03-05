@@ -87,7 +87,7 @@ def prep_training_experiment(experiment_dir,
 
     # Save training config
     training_config['experiment_dir'] = experiment_dir
-    training_config['augment_config'] = augment_path
+    training_config['augment_config']['path'] = augment_path
     training_config['ground_truth']['ground_truth_config'] = ground_truth_path
     
     training_path = os.path.join(experiment_dir, 'training_config.json')
