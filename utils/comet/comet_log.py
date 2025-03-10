@@ -4,7 +4,7 @@ import numpy as np
 from funlib.segment.arrays import relabel
 
 
-def comet_log_batch(i, batch, request, loss_every=1, img_every=100):
+def comet_log_batch(i, batch, request, loss_every=1, img_every=10000):
     '''
     Log batch info to comet.
     '''

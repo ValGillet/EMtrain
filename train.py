@@ -11,6 +11,7 @@ import comet_ml
 import gunpowder as gp
 import logging
 import numpy as np
+import tempfile
 import torch
 
 from datetime import datetime
@@ -236,6 +237,10 @@ def train(experiment_dir,
     
     model_dir = os.path.join(experiment_dir, 'checkpoints')
     os.makedirs(model_dir, exist_ok=True)
+
+    temp_dir = os.path.join(experiment_dir, 'tmp')
+    os.makedirs(temp_dir, exist_ok=True)
+    tempfile.tempdir = temp_dir
     
     profile_every = 10
 
@@ -440,7 +445,7 @@ def train(experiment_dir,
             if comet_exp is not None:      
                 url = '\x1b[36m' + comet_exp.url + '\x1b[0m' # url in blue because it looks fancy
 
-                comet_log_batch(i, batch, request)
+                comet_log_batch(i, batch, request, loss_every=1, img_every=10000)
 
                 if not i%save_every and i != 0:
                     comet_exp.log_model(comet_exp.project_name, 
